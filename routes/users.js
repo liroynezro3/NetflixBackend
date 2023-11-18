@@ -4,6 +4,7 @@ const CryptoJS = require("crypto-js");
 const verify = require("../verifyToken");
 //UPDATE
 router.put("/:id", verify, async (req, res) => {
+  
   if (req.user.id === req.params.id || req.user.isAdmin) {
     if (req.body.password) {
       req.body.password = CryptoJS.AES.encrypt(
@@ -19,7 +20,7 @@ router.put("/:id", verify, async (req, res) => {
       );
       res.status(200).json(updatedUser);
     } catch (err) {
-      req.status(500).json(err);
+      res.status(404).json(err);
     }
   } else {
     res.status(403).json("You can update only your account");
@@ -32,7 +33,7 @@ router.delete("/:id", verify, async (req, res) => {
       await User.findByIdAndDelete(req.params.id);
       res.status(200).json("user has been delete...");
     } catch (err) {
-      req.status(500).json(err);
+      res.status(400).json(err);
     }
   } else {
     res.status(403).json("You can Delete only your account");
@@ -46,7 +47,7 @@ router.get("/find/:id", async (req, res) => {
     const { password, ...info } = user._doc;
     res.status(200).json(info);
   } catch (err) {
-    req.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 //GET ALL
@@ -60,7 +61,7 @@ router.get("/", verify, async (req, res) => {
         : await User.find(); //localhost:8800/api/users/?new=true (show only 4 and the last because of sort)
       res.status(200).json(users);
     } catch (err) {
-      req.status(500).json(err);
+      res.status(400).json(err);
     }
   } else {
     res.status(403).json("You are not allowed to see all users!");
@@ -87,7 +88,7 @@ const data = await User.aggregate([
 res.status(200).json(data)//months(_id) and count(total)
   }
   catch(err){
-  res.status(500).json(err);
+  res.status(400).json(err);
 }
 });
 module.exports = router;
