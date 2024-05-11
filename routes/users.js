@@ -50,7 +50,7 @@ router.get("/find/:id", async (req, res) => {
     res.status(400).json(err);
   }
 });
-//GET ALL
+//GET ALL USERS
 router.get("/", verify, async (req, res) => {
   //localhost:8800/api/users/
   const query = req.query.new;
@@ -58,13 +58,28 @@ router.get("/", verify, async (req, res) => {
     try {
       const users = query
         ? await User.find().sort({ _id: -1 }).limit(5)
-        : await User.find(); //localhost:8800/api/users/?new=true (show only 4 and the last because of sort)
+        : await User.find(); //localhost:8800/api/users/?new=true (show only 5 and the last because of sort)
       res.status(200).json(users);
     } catch (err) {
       res.status(400).json(err);
     }
   } else {
     res.status(403).json("You are not allowed to see all users!");
+  }
+});
+
+//Count all users
+router.get("/countusers", verify, async (req, res) => {
+  //localhost:8800/api/users/countusers
+  if (req.user.isAdmin) {
+    try {
+    const countusers = await User.countDocuments({})
+      res.status(200).json({countusers:countusers});
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  } else {
+    res.status(403).json("You are not allowed to count all users!");
   }
 });
 //GET USER STATS

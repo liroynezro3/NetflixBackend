@@ -88,4 +88,17 @@ router.get("/", verify, async (req, res) => {
     res.status(403).json("You are not allowed!");
   }
 });
+router.get("/countmovies", verify, async (req, res) => {
+  //localhost:8800/api/movies/countmovies
+  if (req.user.isAdmin) {
+    try {
+    const countmovies = await Movie.countDocuments({})
+      res.status(200).json({countmovies:countmovies});
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  } else {
+    res.status(403).json("You are not allowed to count all movies!");
+  }
+});
 module.exports = router;
